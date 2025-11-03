@@ -4,6 +4,7 @@ import time
 import subprocess
 import speech_recognition as sr
 import threading
+import psutil
 
 def listen_for_hotword(hotword="hello purple"):
     recognizer = sr.Recognizer()
@@ -16,7 +17,8 @@ def listen_for_hotword(hotword="hello purple"):
             with mic as source:
                 print("\r[Hotword Service] Listening for 'hello purple'...", end="", flush=True)
                 recognizer.adjust_for_ambient_noise(source, duration=0.5)
-                audio = recognizer.listen(source, timeout=10, phrase_time_limit=5)
+                # Responsive hotword detection: short listen window
+                audio = recognizer.listen(source, timeout=5, phrase_time_limit=3)
             try:
                 query = recognizer.recognize_google(audio, language='en-in').lower().strip()
                 print(f"\r[Hotword Service] Heard: {query}" + " "*20)
@@ -44,6 +46,16 @@ def launch_assistant():
         main_script = os.path.join(script_dir, "main.py")
         
         if os.path.exists(main_script):
+            # If an instance of main.py is already running, do not spawn another
+            for p in psutil.process_iter(['pid', 'name', 'cmdline']):
+                try:
+                    cmdline = p.info.get('cmdline') or []
+                    if any('main.py' in str(x) for x in cmdline):
+                        print(f"[Hotword Service] Assistant already running (pid={p.pid}). Skipping launch.")
+                        return
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+
             # Use CREATE_NEW_CONSOLE flag to open in new window
             CREATE_NEW_CONSOLE = 0x00000010
             subprocess.Popen([sys.executable, main_script],
