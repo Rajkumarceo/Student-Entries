@@ -83,21 +83,21 @@ def command():
                 r.dynamic_energy_adjustment_damping = 0.15
                 r.dynamic_energy_ratio = 1.5
                 
-                print("🎤 Listening... (speak your question/command - you have up to 60 seconds)", end="", flush=True)
-                
+                print("🎤 Listening... (speak your question/command - you have up to 5 minutes)", end="", flush=True)
+
                 try:
                     # Listen for audio with extended timeout for longer questions
-                    # Increased timeout to 60 seconds and phrase_time_limit to 45 seconds
-                    # This allows for longer, more detailed questions
-                    audio = r.listen(source, timeout=60, phrase_time_limit=45)
+                    # Increased timeout and phrase_time_limit to 300 seconds (5 minutes)
+                    # This allows for much longer, more detailed questions or dictation
+                    audio = r.listen(source, timeout=300, phrase_time_limit=300)
                     print("\r✓ Audio captured! Processing your question...", end="", flush=True)
                 except sr.WaitTimeoutError:
-                    print("\r✗ Timeout: No speech detected within 60 seconds.")
+                    print("\r✗ Timeout: No speech detected within 5 minutes.")
                     print("   Troubleshooting:")
                     print("   - Make sure your microphone is not muted")
                     print("   - Check Windows microphone permissions")
                     print("   - Speak louder or closer to the microphone")
-                    print("   - You have 60 seconds to speak - take your time")
+                    print("   - You have up to 5 minutes to speak - take your time")
                     print("   - Try typing 'text' to switch to text input")
                     return None
                 except Exception as e:
@@ -329,6 +329,7 @@ def schedule ():
 
             
 def openApp(command):
+    engine = initialize_engine()  # Initialize speech engine
     if "calculator" in command:
         speak("boss your calculator is opening")
         # Try newer Calculator app first (Windows 10+), then fallback to calc.exe
@@ -353,62 +354,129 @@ def openApp(command):
         os.system('start excel')       
     elif "visual studio code" in command or "vscode" in command or ("code" in command and "visual" in command):
         speak("boss opening Visual Studio Code")
-        import subprocess
-        code_paths = [
-            os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Programs', 'Microsoft VS Code', 'Code.exe'),
-            os.path.join(os.environ.get('PROGRAMFILES', 'C:\\Program Files'), 'Microsoft VS Code', 'Code.exe'),
-            os.path.join(os.environ.get('PROGRAMFILES(X86)', 'C:\\Program Files (x86)'), 'Microsoft VS Code', 'Code.exe'),
-            os.path.expandvars(r'%USERPROFILE%\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe'),
-            os.path.expandvars(r'%ProgramFiles%\\Microsoft VS Code\\Code.exe'),
-            os.path.expandvars(r'%ProgramFiles(x86)%\\Microsoft VS Code\\Code.exe')
-        ]
-        opened = False
-        for path in code_paths:
-            print(f"Checking for VS Code at: {path}")
-            if path and os.path.exists(path):
+        # Multiple methods to find and open VS Code
+        try:
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            
+            # Try common VS Code paths
+            possible_paths = [
+                'code',  # If VS Code is in PATH
+                os.path.expandvars(r'%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe'),
+                os.path.expandvars(r'%PROGRAMFILES%\Microsoft VS Code\Code.exe'),
+                os.path.expandvars(r'%PROGRAMFILES(X86)%\Microsoft VS Code\Code.exe'),
+                r'C:\Program Files\Microsoft VS Code\Code.exe',
+                r'C:\Program Files (x86)\Microsoft VS Code\Code.exe'
+            ]
+            
+            for path in possible_paths:
                 try:
-                    subprocess.Popen([path], shell=True)
-                    opened = True
+                    subprocess.Popen(path, startupinfo=startupinfo)
+                    return  # Exit if successful
+                except:
+                    continue
+                    
+            # If all paths fail, try Windows Run command
+            subprocess.run('cmd /c start code', shell=True, startupinfo=startupinfo)
+        except Exception as e:
+            print(f"Error opening VS Code: {e}")
+            speak("I encountered an error opening Visual Studio Code")
+            
+    elif "cursor" in command or "cursor ai" in command:
+        speak("boss opening Cursor AI")
+        try:
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            
+            # Try common Cursor paths
+            possible_paths = [
+                os.path.expandvars(r'%LOCALAPPDATA%\Programs\Cursor\Cursor.exe'),
+                os.path.expandvars(r'%USERPROFILE%\AppData\Local\Programs\Cursor\Cursor.exe'),
+                r'C:\Program Files\Cursor\Cursor.exe',
+                r'C:\Program Files (x86)\Cursor\Cursor.exe'
+            ]
+            
+            for path in possible_paths:
+                try:
+                    if os.path.exists(path):
+                        subprocess.Popen(path, startupinfo=startupinfo)
+                        return  # Exit if successful
+                except:
+                    continue
+                    
+            # Try using the Start Menu shortcut
+            subprocess.run('cmd /c start cursor', shell=True, startupinfo=startupinfo)
+        except Exception as e:
+            print(f"Error opening Cursor AI: {e}")
+            speak("I encountered an error opening Cursor AI")
+            print("✓ Opened VS Code using 'code' command")
+            return
+        except Exception as e:
+            print(f"⚠ Could not open VS Code with 'code' command: {e}")
+        
+        # Search common VS Code installation paths
+        vscode_paths = [
+            os.path.expandvars(r"%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe"),
+            os.path.expandvars(r"%PROGRAMFILES%\Microsoft VS Code\Code.exe"),
+            os.path.expandvars(r"%PROGRAMFILES(X86)%\Microsoft VS Code\Code.exe"),
+            r"C:\Program Files\Microsoft VS Code\Code.exe",
+            r"C:\Program Files (x86)\Microsoft VS Code\Code.exe",
+            os.path.expanduser("~\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe")
+        ]
+        
+        for path in vscode_paths:
+            if os.path.exists(path):
+                try:
+                    startupinfo = subprocess.STARTUPINFO()
+                    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                    subprocess.Popen([path], startupinfo=startupinfo)
                     print(f"✓ Opened VS Code from: {path}")
-                    break
+                    return
                 except Exception as e:
-                    print(f"⚠ VS Code open error for {path}: {e}")
-        if not opened:
-            try:
-                subprocess.Popen(["code"], shell=True)
-                opened = True
-                print("✓ Opened VS Code using 'code' CLI")
-            except Exception as e:
-                print(f"⚠ Fallback VS Code open failed: {e}")
-        if not opened:
-            speak('Could not find installed Visual Studio Code on this PC.')
-            print('✗ Visual Studio Code not found on this PC.')
+                    print(f"⚠ Failed to open VS Code from {path}: {e}")
+                    continue
+        
+        speak('Could not find Visual Studio Code. Please verify it is installed.')
+        print('✗ VS Code not found in any expected location')
 
     elif "cursor" in command:
         speak("boss opening Cursor")
-        import subprocess
+        # Common Cursor installation paths
         cursor_paths = [
-            os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Programs', 'Cursor', 'Cursor.exe'),
-            os.path.join(os.environ.get('PROGRAMFILES', 'C:\\Program Files'), 'Cursor', 'Cursor.exe'),
-            os.path.join(os.environ.get('PROGRAMFILES(X86)', 'C:\\Program Files (x86)'), 'Cursor', 'Cursor.exe'),
-            os.path.expandvars(r'%USERPROFILE%\\AppData\\Local\\Programs\\Cursor\\Cursor.exe'),
-            os.path.expandvars(r'%ProgramFiles%\\Cursor\\Cursor.exe'),
-            os.path.expandvars(r'%ProgramFiles(x86)%\\Cursor\\Cursor.exe')
+            os.path.expandvars(r"%LOCALAPPDATA%\Programs\Cursor\Cursor.exe"),
+            os.path.expandvars(r"%APPDATA%\Local\Programs\Cursor\Cursor.exe"),
+            os.path.expanduser("~\\AppData\\Local\\Programs\\Cursor\\Cursor.exe"),
+            os.path.expandvars(r"%PROGRAMFILES%\Cursor\Cursor.exe"),
+            os.path.expandvars(r"%PROGRAMFILES(X86)%\Cursor\Cursor.exe"),
+            r"C:\Program Files\Cursor\Cursor.exe",
+            r"C:\Program Files (x86)\Cursor\Cursor.exe"
         ]
-        opened_cursor = False
+        
+        # Try registry query for Cursor installation path
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Cursor.exe") as key:
+                reg_path = winreg.QueryValue(key, None)
+                if reg_path and reg_path not in cursor_paths:
+                    cursor_paths.insert(0, reg_path)
+        except Exception:
+            pass  # Registry key not found, continue with default paths
+        
+        # Try to launch Cursor
         for path in cursor_paths:
-            print(f"Checking for Cursor at: {path}")
-            if path and os.path.exists(path):
+            if os.path.exists(path):
                 try:
-                    subprocess.Popen([path], shell=True)
-                    opened_cursor = True
+                    startupinfo = subprocess.STARTUPINFO()
+                    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                    subprocess.Popen([path], startupinfo=startupinfo)
                     print(f"✓ Opened Cursor from: {path}")
-                    break
+                    return
                 except Exception as e:
-                    print(f"⚠ Cursor open error for {path}: {e}")
-        if not opened_cursor:
-            speak('Could not find installed Cursor app on this PC.')
-            print('✗ Cursor app not found on this PC.')
+                    print(f"⚠ Failed to open Cursor from {path}: {e}")
+                    continue
+        
+        speak('Could not find Cursor. Please verify it is installed.')
+        print('✗ Cursor not found in any expected location')
     else:
         speak("I couldn't find that application")
 
@@ -905,24 +973,11 @@ if __name__ == "__main__":
         print(f"\n✓ Detected {len(mics)} microphone(s)")
         if len(mics) > 0:
             print(f"  Default mic: {mics[0]}")
-    except:
-        print("\n⚠ Could not detect microphones")
-    
-    print("\nOptions:")
-    print("1. Voice commands (requires working microphone)")
-    print("2. Text commands (recommended if voice doesn't work)")
-    print("\nEnter '1' or '2', or press Enter for voice (default): ", end="")
-    
-    try:
-        choice = input().strip()
-        if choice == "2":
-            use_voice = False
-            print("\n✓ Switched to text input mode.")
-        else:
-            print("\n✓ Using voice input mode.")
-    except:
-        print("\n✓ Using voice input mode (default).")
-        pass  # Default to voice
+        use_voice = True  # Always use voice mode
+        speak("Voice assistant is ready. You can speak your commands now.")
+    except Exception as e:
+        print(f"\n⚠ Microphone error: {e}")
+        speak("Warning: Microphone not detected. Please check your settings.")
     
     while True:
         try:
@@ -970,8 +1025,27 @@ if __name__ == "__main__":
                 continue
 
             if "exit" in query or query == "quit":
-                speak("Goodbye boss!")
-                sys.exit()
+                speak("Goodbye boss! Say 'hello purple' when you need me again.")
+                print("\n✓ Assistant is now idle. Say 'hello purple' to reactivate.")
+                # Wait for "hello purple" to reactivate
+                while True:
+                    try:
+                        if use_voice:
+                            reactivate_query = command()
+                            if reactivate_query and "hello purple" in reactivate_query.lower():
+                                speak("Hello boss! I'm back and ready to help.")
+                                print("\n✓ Assistant reactivated!")
+                                break
+                        else:
+                            reactivate_query = input("\nSay 'hello purple' to reactivate: ").strip()
+                            if reactivate_query and "hello purple" in reactivate_query.lower():
+                                speak("Hello boss! I'm back and ready to help.")
+                                print("\n✓ Assistant reactivated!")
+                                break
+                    except Exception as e:
+                        print(f"\n⚠ Error in reactivation: {e}")
+                        time.sleep(1)  # Prevent busy loop
+                continue  # Return to main loop after reactivation
             elif "hello purple" in query_lower or query_lower.strip() == "hello purple":
                 # User requested the special command to enable weather even if offline
                 try:
@@ -1097,6 +1171,11 @@ if __name__ == "__main__":
                     # Only open if "close", "stop", or "exit" is not in the query
                     if not any(word in query_lower for word in ["close", "stop", "exit"]):
                         social_media(query)
+                # Handle VS Code and Cursor opening directly
+                elif ("visual studio code" in query_lower) or ("vscode" in query_lower) or ("vs code" in query_lower) or \
+                     ("cursor" in query_lower and "ai" in query_lower) or (query_lower.strip() == "cursor"):
+                    print(f"✓ App opening command detected: '{query}'")
+                    openApp(query)
                 elif ("system condition" in query_lower) or ("system status" in query_lower) or ("system information" in query_lower) or (query_lower.strip() in ["condition", "status", "information"] and len(query.split()) == 1):
                     print(f"✓ System condition command detected: '{query}'")
                     condition()
