@@ -353,61 +353,62 @@ def openApp(command):
         os.system('start excel')       
     elif "visual studio code" in command or "vscode" in command or ("code" in command and "visual" in command):
         speak("boss opening Visual Studio Code")
-        # Try common VS Code installation paths
+        import subprocess
         code_paths = [
+            os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Programs', 'Microsoft VS Code', 'Code.exe'),
             os.path.join(os.environ.get('PROGRAMFILES', 'C:\\Program Files'), 'Microsoft VS Code', 'Code.exe'),
             os.path.join(os.environ.get('PROGRAMFILES(X86)', 'C:\\Program Files (x86)'), 'Microsoft VS Code', 'Code.exe'),
-            os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Programs', 'Microsoft VS Code', 'Code.exe')
+            os.path.expandvars(r'%USERPROFILE%\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe'),
+            os.path.expandvars(r'%ProgramFiles%\\Microsoft VS Code\\Code.exe'),
+            os.path.expandvars(r'%ProgramFiles(x86)%\\Microsoft VS Code\\Code.exe')
         ]
         opened = False
         for path in code_paths:
-            try:
-                if path and os.path.exists(path):
-                    os.startfile(path)
+            print(f"Checking for VS Code at: {path}")
+            if path and os.path.exists(path):
+                try:
+                    subprocess.Popen([path], shell=True)
                     opened = True
                     print(f"✓ Opened VS Code from: {path}")
                     break
-            except Exception as e:
-                print(f"⚠ VS Code open error for {path}: {e}")
+                except Exception as e:
+                    print(f"⚠ VS Code open error for {path}: {e}")
         if not opened:
-            # Fallback: try the 'code' CLI or open via start
             try:
-                os.system('start code')
+                subprocess.Popen(["code"], shell=True)
                 opened = True
+                print("✓ Opened VS Code using 'code' CLI")
             except Exception as e:
                 print(f"⚠ Fallback VS Code open failed: {e}")
-
         if not opened:
-            # Final fallback: open VS Code download page
-            webbrowser.open('https://code.visualstudio.com/')
-            speak('Could not find installed VS Code. I opened the download page instead.')
+            speak('Could not find installed Visual Studio Code on this PC.')
+            print('✗ Visual Studio Code not found on this PC.')
 
     elif "cursor" in command:
         speak("boss opening Cursor")
-        # Try to open a likely installed Cursor app; otherwise open the website
+        import subprocess
         cursor_paths = [
             os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Programs', 'Cursor', 'Cursor.exe'),
             os.path.join(os.environ.get('PROGRAMFILES', 'C:\\Program Files'), 'Cursor', 'Cursor.exe'),
-            os.path.join(os.environ.get('PROGRAMFILES(X86)', 'C:\\Program Files (x86)'), 'Cursor', 'Cursor.exe')
+            os.path.join(os.environ.get('PROGRAMFILES(X86)', 'C:\\Program Files (x86)'), 'Cursor', 'Cursor.exe'),
+            os.path.expandvars(r'%USERPROFILE%\\AppData\\Local\\Programs\\Cursor\\Cursor.exe'),
+            os.path.expandvars(r'%ProgramFiles%\\Cursor\\Cursor.exe'),
+            os.path.expandvars(r'%ProgramFiles(x86)%\\Cursor\\Cursor.exe')
         ]
         opened_cursor = False
         for path in cursor_paths:
-            try:
-                if path and os.path.exists(path):
-                    os.startfile(path)
+            print(f"Checking for Cursor at: {path}")
+            if path and os.path.exists(path):
+                try:
+                    subprocess.Popen([path], shell=True)
                     opened_cursor = True
                     print(f"✓ Opened Cursor from: {path}")
                     break
-            except Exception as e:
-                print(f"⚠ Cursor open error for {path}: {e}")
+                except Exception as e:
+                    print(f"⚠ Cursor open error for {path}: {e}")
         if not opened_cursor:
-            # Fallback to web version
-            try:
-                webbrowser.open('https://www.cursor.so/')
-                opened_cursor = True
-                print('✓ Opened Cursor website')
-            except Exception as e:
-                print(f"✗ Could not open Cursor: {e}")
+            speak('Could not find installed Cursor app on this PC.')
+            print('✗ Cursor app not found on this PC.')
     else:
         speak("I couldn't find that application")
 
@@ -956,7 +957,9 @@ if __name__ == "__main__":
                 if not query:
                     continue
                 print(f"DEBUG: Received command: '{query}'")
-            
+
+            query_lower = query.lower()
+
             if query == "text" and use_voice:
                 use_voice = False
                 print("Switched to text input mode.")
@@ -965,7 +968,7 @@ if __name__ == "__main__":
                 use_voice = True
                 print("Switched to voice input mode.")
                 continue
-            
+
             if "exit" in query or query == "quit":
                 speak("Goodbye boss!")
                 sys.exit()
