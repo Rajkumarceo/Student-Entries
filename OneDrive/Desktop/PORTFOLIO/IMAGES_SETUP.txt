@@ -1,0 +1,45 @@
+IMAGE SETUP INSTRUCTIONS
+========================
+
+Your portfolio website is now configured to display:
+1. Your profile picture (profile.jpg)
+2. Titanobova company logo (titanobova.jpg)
+
+STEPS TO ADD THE IMAGES:
+
+1. Save your profile picture as "profile.jpg" in the PORTFOLIO folder
+   - Location: c:\Users\Rajkumar\OneDrive\Desktop\PORTFOLIO\profile.jpg
+   - Format: JPG/PNG (JPG recommended for photos)
+   - Size recommendation: 280x280px (will be auto-sized)
+
+2. Save your Titanobova logo as "titanobova.jpg" in the PORTFOLIO folder
+   - Location: c:\Users\Rajkumar\OneDrive\Desktop\PORTFOLIO\titanobova.jpg
+   - Format: JPG/PNG (either works well for logos)
+   - Size recommendation: 250px width (responsive height)
+
+3. Open index.html in your browser to verify images display correctly
+
+ALTERNATE FILE NAMES:
+
+If you prefer different file names, edit these lines in index.html:
+- Profile image: Change "profile.jpg" to your filename (line ~34)
+- Company logo: Change "titanobova.jpg" to your filename (line ~49)
+
+STYLING FEATURES:
+
+✓ Profile picture: Green neon border with glow effect, 280x280px rounded
+✓ Company logo: Drop shadow glow effect, responsive scaling
+✓ Both images have hover animations
+✓ Fully responsive on mobile devices
+
+SUPPORTED FORMATS:
+- JPG
+- PNG
+- WebP
+- JPEG
+
+If images don't appear, make sure:
+1. Files are in the correct PORTFOLIO folder
+2. File names match exactly (case-sensitive)
+3. File extensions are correct (.jpg or .png)
+4. Images are not corrupted

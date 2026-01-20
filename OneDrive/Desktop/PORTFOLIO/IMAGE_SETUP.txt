@@ -1,0 +1,38 @@
+IMAGE SETUP INSTRUCTIONS
+========================
+
+Your portfolio needs two image files in the same directory as index.html:
+
+1. profile.jpg - Your personal profile photo
+   - Currently referenced in: index.html (hero section)
+   - Used in: .profile-pic class in styles.css
+   - Recommended size: 300x300px or larger
+   - Format: JPG
+   - The second image you provided (you with the blue bike)
+
+2. titanobova.jpg - Titanobova Private Limited company logo
+   - Currently referenced in: index.html (about section)
+   - Used in: .company-logo class in styles.css
+   - Recommended size: 200x200px or larger
+   - Format: JPG
+   - The first image you provided (company logo)
+
+HOW TO ADD IMAGES:
+1. Take your two images and save them in: c:\Users\Rajkumar\OneDrive\Desktop\PORTFOLIO\
+   - Image 1 (gold S logo): Save as "titanobova.jpg"
+   - Image 2 (you with bike): Save as "profile.jpg"
+
+2. The HTML and CSS are already configured to display these images
+
+UPDATED SOCIAL LINKS:
+- LinkedIn: https://www.linkedin.com/in/rajkumarr-founder-titanobovapvt
+- Instagram: https://www.instagram.com/rajkumar_.in?igsh=NXFkanhxNjhscmVo
+- GitHub: https://www.instagram.com/rajkumar_.in?igsh=NXFkanhxNjhscmVo
+
+DESIGN IMPROVEMENTS MADE:
+✓ Enhanced profile image hover effects (scale + lift animation)
+✓ Improved social icon hover effects (better glow + lift)
+✓ Enhanced achievement card hover effects (stronger glow)
+✓ Enhanced service card hover effects (more dramatic transform)
+✓ Better visual feedback on all interactive elements
+✓ Smoother transitions and animations throughout
