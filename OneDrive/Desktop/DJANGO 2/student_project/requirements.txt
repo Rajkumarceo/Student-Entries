@@ -1,0 +1,21 @@
+# Django framework and dependencies for the Student Management System
+
+# Django web framework - version 4.0+
+Django==4.2.0
+
+# Python module for working with dates and timezones
+pytz==2023.3
+
+# SQLAlchemy is not needed for SQLite, but useful for advanced queries
+# sqlalchemy==2.0.0
+
+# Pillow for image processing (if you add profile pictures)
+Pillow==10.0.0
+
+# Django extensions for additional commands and utilities
+django-extensions==3.2.3
+
+# For production deployment (optional)
+# gunicorn==21.2.0
+# psycopg2-binary==2.9.7  # For PostgreSQL support
+# python-decouple==3.8  # For environment variables

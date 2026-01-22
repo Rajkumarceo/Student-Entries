@@ -1,0 +1,152 @@
+<!-- Extend base template -->
+{% extends 'student_app/base.html' %}
+
+<!-- Set page title -->
+{% block title %}Delete Student - Student Management System{% endblock %}
+
+<!-- Main content -->
+{% block content %}
+    <!-- Page heading -->
+    <h1>
+        <i class="fas fa-trash text-danger"></i> Delete Student
+    </h1>
+
+    <!-- Warning card -->
+    <div class="row">
+        <!-- Alert box spanning full width -->
+        <div class="col-md-8">
+            <!-- Bootstrap alert with danger styling -->
+            <div class="alert alert-danger" role="alert">
+                <!-- Warning icon and message -->
+                <h4 class="alert-heading">
+                    <i class="fas fa-warning"></i> Warning!
+                </h4>
+                <p>
+                    You are about to permanently delete the following student record:
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student details card to confirm deletion -->
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Card showing student to be deleted -->
+            <div class="card card-body mb-4">
+                <!-- Display student information -->
+                <div class="row">
+                    <!-- Left column -->
+                    <div class="col-md-6">
+                        <!-- Full name -->
+                        <p>
+                            <strong>Name:</strong>
+                            <br>
+                            {{ student.first_name }} {{ student.last_name }}
+                        </p>
+                        
+                        <!-- Email -->
+                        <p>
+                            <strong>Email:</strong>
+                            <br>
+                            {{ student.email }}
+                        </p>
+                        
+                        <!-- Roll number -->
+                        <p>
+                            <strong>Roll Number:</strong>
+                            <br>
+                            {{ student.roll_number }}
+                        </p>
+                    </div>
+                    
+                    <!-- Right column -->
+                    <div class="col-md-6">
+                        <!-- Grade -->
+                        <p>
+                            <strong>Grade:</strong>
+                            <br>
+                            {{ student.get_grade_display }}
+                        </p>
+                        
+                        <!-- Date of birth -->
+                        <p>
+                            <strong>Date of Birth:</strong>
+                            <br>
+                            {{ student.date_of_birth|date:"F j, Y" }}
+                        </p>
+                        
+                        <!-- Phone -->
+                        <p>
+                            <strong>Phone:</strong>
+                            <br>
+                            {{ student.phone_number }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation message -->
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>This action cannot be undone!</strong>
+                <br>
+                All data associated with this student will be permanently deleted.
+            </div>
+
+            <!-- Confirmation form -->
+            <!-- This is the form that actually deletes the student -->
+            <form method="POST">
+                <!-- CSRF token for security -->
+                {% csrf_token %}
+
+                <!-- Button group for delete/cancel -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <!-- Confirm Delete button -->
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        <i class="fas fa-trash"></i> Yes, Delete This Student
+                    </button>
+
+                    <!-- Cancel button (back to list) -->
+                    <a href="{% url 'student_list' %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-ban"></i> Cancel, Keep Student
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right sidebar with safe practices -->
+        <div class="col-md-4">
+            <!-- Information card -->
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Important
+                    </h5>
+                </div>
+
+                <!-- Card body -->
+                <div class="card-body">
+                    <h6 class="text-danger">
+                        <i class="fas fa-info-circle"></i> What happens?
+                    </h6>
+                    <ul class="small">
+                        <li>Student record will be permanently removed</li>
+                        <li>All associated data will be deleted</li>
+                        <li>This action <strong>cannot be reversed</strong></li>
+                        <li>No backup will be available</li>
+                    </ul>
+
+                    <!-- Recommendation -->
+                    <div class="mt-4 p-3 bg-light border">
+                        <h6>Recommendation:</h6>
+                        <p class="small mb-0">
+                            Consider marking the student as inactive instead of deleting. 
+                            This preserves historical records.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

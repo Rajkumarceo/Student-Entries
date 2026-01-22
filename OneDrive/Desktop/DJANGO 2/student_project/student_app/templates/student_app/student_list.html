@@ -1,0 +1,204 @@
+<!-- This template extends base.html, inheriting all its HTML structure and styling -->
+{% extends 'student_app/base.html' %}
+
+<!-- Set the page title that appears in browser tab -->
+{% block title %}Student List - Student Management System{% endblock %}
+
+<!-- Define the main content block -->
+{% block content %}
+    <!-- Main heading -->
+    <h1>
+        <!-- Icon and title text -->
+        <i class="fas fa-users"></i> Student List
+    </h1>
+
+    <!-- Search and Filter Section -->
+    <div class="mb-4">
+        <!-- Form for searching students -->
+        <!-- method="GET" sends form data in URL parameters -->
+        <form method="GET" class="row g-3">
+            <!-- Search input field -->
+            <div class="col-md-8">
+                <!-- Input field for search query -->
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="form-control" 
+                    placeholder="Search by name, email, or roll number..."
+                    value="{{ search_query }}"  <!-- Retain previous search value -->
+                    aria-label="Search students"  <!-- Accessibility label -->
+                >
+            </div>
+            
+            <!-- Search button -->
+            <div class="col-md-4">
+                <!-- Submit button that sends the form -->
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Stats section showing counts -->
+    <div class="row mb-4">
+        <!-- Card showing total students -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <!-- Icon -->
+                    <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+                    <!-- Count -->
+                    <h5 class="card-title">Total Students</h5>
+                    <h2 class="text-primary">{{ total_students }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card showing search results -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-list fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Results Found</h5>
+                    <h2 class="text-success">{{ students|length }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card with action button -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+                    <!-- Link to create new student -->
+                    <h5 class="card-title">Add New</h5>
+                    <a href="{% url 'student_create' %}" class="btn btn-success mt-2">
+                        <i class="fas fa-plus"></i> Create Student
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Check if students exist -->
+    {% if students %}
+        <!-- Table for displaying students -->
+        <div class="table-responsive">
+            <!-- table class="table": Bootstrap table styling -->
+            <table class="table table-striped table-hover">
+                <!-- Table header -->
+                <thead class="table-dark">
+                    <tr>
+                        <!-- Column headers -->
+                        <th>Roll No.</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Grade</th>
+                        <th>Age</th>
+                        <th>Status</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <!-- Table body with student data -->
+                <tbody>
+                    <!-- for loop: iterate through all students -->
+                    {% for student in students %}
+                        <!-- tr = table row -->
+                        <tr>
+                            <!-- Roll number -->
+                            <td><strong>{{ student.roll_number }}</strong></td>
+                            
+                            <!-- First name with link to detail view -->
+                            <!-- Link to student detail page using URL tag -->
+                            <td>
+                                <a href="{% url 'student_detail' student.pk %}">
+                                    {{ student.first_name }}
+                                </a>
+                            </td>
+                            
+                            <!-- Last name -->
+                            <td>{{ student.last_name }}</td>
+                            
+                            <!-- Email -->
+                            <td>
+                                <!-- Link to email -->
+                                <a href="mailto:{{ student.email }}">
+                                    {{ student.email }}
+                                </a>
+                            </td>
+                            
+                            <!-- Grade with badge styling -->
+                            <td>
+                                <!-- Badge shows grade with color -->
+                                <span class="badge bg-primary">
+                                    {{ student.get_grade_display }}
+                                </span>
+                            </td>
+                            
+                            <!-- Age -->
+                            <td>{{ student.age }}</td>
+                            
+                            <!-- Active status with conditional styling -->
+                            <td>
+                                <!-- if statement: check if student is active -->
+                                {% if student.is_active %}
+                                    <!-- Show active status in green -->
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <!-- Show inactive status in red -->
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Registration date -->
+                            <!-- date filter formats the date display -->
+                            <td>{{ student.date_of_registration|date:"M d, Y" }}</td>
+                            
+                            <!-- Action buttons -->
+                            <td>
+                                <!-- View/Detail button -->
+                                <a 
+                                    href="{% url 'student_detail' student.pk %}" 
+                                    class="btn btn-sm btn-info"
+                                    title="View details"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                
+                                <!-- Edit button -->
+                                <a 
+                                    href="{% url 'student_update' student.pk %}" 
+                                    class="btn btn-sm btn-warning"
+                                    title="Edit student"
+                                >
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                <!-- Delete button -->
+                                <a 
+                                    href="{% url 'student_delete' student.pk %}" 
+                                    class="btn btn-sm btn-danger"
+                                    title="Delete student"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <!-- Message shown when no students exist -->
+        <div class="alert alert-info">
+            <!-- Icon and message -->
+            <i class="fas fa-info-circle"></i>
+            <!-- Message text with action button -->
+            No students found. 
+            <a href="{% url 'student_create' %}" class="alert-link">Create the first student</a>.
+        </div>
+    {% endif %}
+{% endblock %}

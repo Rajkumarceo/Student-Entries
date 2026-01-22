@@ -1,0 +1,217 @@
+<!-- Extend the base template to use its structure -->
+{% extends 'student_app/base.html' %}
+
+<!-- Set page title -->
+{% block title %}{{ student.first_name }} {{ student.last_name }} - Student Management System{% endblock %}
+
+<!-- Main content block -->
+{% block content %}
+    <!-- Back button to return to list -->
+    <div class="mb-4">
+        <a href="{% url 'student_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Main heading with student name -->
+    <h1>
+        <i class="fas fa-user"></i> {{ student.first_name }} {{ student.last_name }}
+    </h1>
+
+    <!-- Container with student details -->
+    <div class="row">
+        <!-- Left column: Personal Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <!-- Card header -->
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-id-card"></i> Personal Information
+                    </h5>
+                </div>
+                
+                <!-- Card body with details -->
+                <div class="card-body">
+                    <!-- Display first name -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>First Name:</strong></label>
+                        <p class="form-control-plaintext">{{ student.first_name }}</p>
+                    </div>
+                    
+                    <!-- Display last name -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Last Name:</strong></label>
+                        <p class="form-control-plaintext">{{ student.last_name }}</p>
+                    </div>
+                    
+                    <!-- Display age -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Age:</strong></label>
+                        <p class="form-control-plaintext">{{ student.age }} years</p>
+                    </div>
+                    
+                    <!-- Display date of birth -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Date of Birth:</strong></label>
+                        <p class="form-control-plaintext">
+                            {{ student.date_of_birth|date:"F j, Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column: Academic Information Card -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <!-- Card header -->
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book"></i> Academic Information
+                    </h5>
+                </div>
+                
+                <!-- Card body -->
+                <div class="card-body">
+                    <!-- Display roll number -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Roll Number:</strong></label>
+                        <p class="form-control-plaintext">{{ student.roll_number }}</p>
+                    </div>
+                    
+                    <!-- Display grade -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Grade:</strong></label>
+                        <p class="form-control-plaintext">
+                            <!-- get_grade_display shows the human-readable grade -->
+                            <span class="badge bg-primary">
+                                {{ student.get_grade_display }}
+                            </span>
+                        </p>
+                    </div>
+                    
+                    <!-- Display active status -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Status:</strong></label>
+                        <p class="form-control-plaintext">
+                            <!-- Conditional badge color based on status -->
+                            {% if student.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <!-- Display registration date -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Registered on:</strong></label>
+                        <p class="form-control-plaintext">
+                            {{ student.date_of_registration|date:"F j, Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <!-- Card header -->
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-envelope"></i> Contact Information
+                    </h5>
+                </div>
+                
+                <!-- Card body -->
+                <div class="card-body">
+                    <!-- Display email -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Email:</strong></label>
+                        <p class="form-control-plaintext">
+                            <!-- Clickable mailto link -->
+                            <a href="mailto:{{ student.email }}">
+                                {{ student.email }}
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <!-- Display phone number -->
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Phone:</strong></label>
+                        <p class="form-control-plaintext">
+                            <!-- Clickable tel link -->
+                            <a href="tel:{{ student.phone_number }}">
+                                {{ student.phone_number }}
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <!-- Card header -->
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt"></i> Address
+                    </h5>
+                </div>
+                
+                <!-- Card body -->
+                <div class="card-body">
+                    <!-- Display address -->
+                    <p class="form-control-plaintext">
+                        {{ student.address }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Last Updated Information -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i> Record Information
+                    </h5>
+                </div>
+                
+                <!-- Card body -->
+                <div class="card-body">
+                    <!-- Display last updated time -->
+                    <p>
+                        <strong>Last Updated:</strong> 
+                        {{ student.updated_at|date:"F j, Y \a\t g:i A" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-4">
+        <!-- Edit button -->
+        <a href="{% url 'student_update' student.pk %}" class="btn btn-warning btn-lg">
+            <i class="fas fa-edit"></i> Edit Student
+        </a>
+        
+        <!-- Delete button -->
+        <a href="{% url 'student_delete' student.pk %}" class="btn btn-danger btn-lg">
+            <i class="fas fa-trash"></i> Delete Student
+        </a>
+        
+        <!-- Back button -->
+        <a href="{% url 'student_list' %}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+{% endblock %}

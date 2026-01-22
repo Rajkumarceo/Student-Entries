@@ -1,0 +1,169 @@
+<!-- Extend base template -->
+{% extends 'student_app/base.html' %}
+
+<!-- Set page title -->
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Student - Student Management System{% endblock %}
+
+<!-- Main content -->
+{% block content %}
+    <!-- Back button -->
+    <div class="mb-4">
+        <a href="{% url 'student_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <!-- Page heading - Show "Edit" or "Create" based on form state -->
+    <h1>
+        <i class="fas fa-pen-square"></i>
+        {% if form.instance.pk %}
+            Edit Student: {{ form.instance.first_name }} {{ form.instance.last_name }}
+        {% else %}
+            Create New Student
+        {% endif %}
+    </h1>
+
+    <!-- Card container for the form -->
+    <div class="row">
+        <!-- Form takes up full width on mobile, 8 columns on desktop -->
+        <div class="col-md-8">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <!-- Show different icons and text based on form state -->
+                        {% if form.instance.pk %}
+                            <i class="fas fa-edit"></i> Edit Student Information
+                        {% else %}
+                            <i class="fas fa-user-plus"></i> Student Registration
+                        {% endif %}
+                    </h5>
+                </div>
+
+                <!-- Card body with form -->
+                <div class="card-body">
+                    <!-- Form element -->
+                    <!-- method="POST": sends data as POST request -->
+                    <!-- enctype="multipart/form-data": required if form has file uploads -->
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- CSRF token: required for security (prevents CSRF attacks) -->
+                        {% csrf_token %}
+
+                        <!-- Display non-field errors (errors not tied to specific fields) -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <strong>Errors:</strong>
+                                <!-- List all non-field errors -->
+                                <ul>
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <!-- Loop through all form fields -->
+                        {% for field in form %}
+                            <!-- Skip hidden fields (they don't need visible display) -->
+                            {% if field.widget.input_type != 'hidden' %}
+                                <!-- Div for form group -->
+                                <div class="mb-3">
+                                    <!-- Label for the field -->
+                                    <!-- field.label_tag renders the label element -->
+                                    <label for="{{ field.id_for_label }}" class="form-label">
+                                        {{ field.label }}
+                                        <!-- Show asterisk for required fields -->
+                                        {% if field.field.required %}
+                                            <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>
+
+                                    <!-- Render the form field widget -->
+                                    <!-- field renders the input/select/textarea element -->
+                                    {{ field }}
+
+                                    <!-- Display field-specific help text -->
+                                    {% if field.help_text %}
+                                        <!-- Small text below field for hints -->
+                                        <small class="form-text text-muted d-block mt-1">
+                                            {{ field.help_text|safe }}
+                                        </small>
+                                    {% endif %}
+
+                                    <!-- Display field validation errors -->
+                                    {% if field.errors %}
+                                        <!-- Red error messages -->
+                                        <div class="invalid-feedback d-block">
+                                            <!-- Loop through error messages for this field -->
+                                            {% for error in field.errors %}
+                                                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Submit button section -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <!-- Show different text based on form state -->
+                                {% if form.instance.pk %}
+                                    <i class="fas fa-save"></i> Update Student
+                                {% else %}
+                                    <i class="fas fa-plus"></i> Create Student
+                                {% endif %}
+                            </button>
+
+                            <!-- Reset button to clear form -->
+                            <button type="reset" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+
+                            <!-- Cancel button to go back -->
+                            <a href="{% url 'student_list' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right sidebar with instructions -->
+        <div class="col-md-4">
+            <!-- Information card -->
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Instructions
+                    </h5>
+                </div>
+
+                <!-- Card body -->
+                <div class="card-body">
+                    <!-- Instructions list -->
+                    <h6>Please note:</h6>
+                    <ul>
+                        <li>Fields marked with <span class="text-danger">*</span> are required</li>
+                        <li>Email addresses must be unique</li>
+                        <li>Roll number must be unique</li>
+                        <li>Age must be between 5 and 100</li>
+                        <li>All personal information is mandatory</li>
+                    </ul>
+
+                    <!-- Tips section -->
+                    <h6 class="mt-4">Tips:</h6>
+                    <ul>
+                        <li>Use a valid email address</li>
+                        <li>Include area code in phone number</li>
+                        <li>Provide complete address details</li>
+                        <li>Check information before submitting</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
